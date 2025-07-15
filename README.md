@@ -78,6 +78,7 @@ fastapi
 uvicorn
 redis
 pydantic
+pytest
 ```
 
 ---
