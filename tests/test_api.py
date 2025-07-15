@@ -1,11 +1,14 @@
 import pytest
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 from app.main import app
 from datetime import datetime
 
+pytestmark = pytest.mark.asyncio
+
 @pytest.mark.asyncio
 async def test_create_shipment():
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
         payload = {
             "id": "test-123",
             "origin_date": datetime.now().isoformat(),
@@ -17,7 +20,8 @@ async def test_create_shipment():
 
 @pytest.mark.asyncio
 async def test_create_shipment_event():
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
         payload = {
             "shipment_id": "test-123",
             "event": "INTEGRATED",

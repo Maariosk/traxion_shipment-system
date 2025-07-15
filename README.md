@@ -81,5 +81,11 @@ pydantic
 ```
 
 ---
+## 🧪 Pruebas Unitarias
 
-¡Listo para correr localmente o subir a la nube (GCP/AWS) y conectar un Redis gestionado! 🚚💨
+¡Las pruebas son súper importantes para un buen código! Para este proyecto se uso **Pytest** para nuestras pruebas unitarias, así nos aseguramos de que cada componente de nuestro sistema haga exactamente lo que se espera.
+
+### Instalación de Pytest (si aún no lo tienes):
+Si no lo instalaste al inicio con `pip install -r requirements.txt`, puedes hacerlo individualmente:
+```bash
+pip install pytest

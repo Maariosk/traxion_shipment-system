@@ -7,5 +7,5 @@ router = APIRouter()
 
 @router.post("/v1/shipment-events")
 def create_shipment_event(event: ShipmentEvent):
-    bus.publish("shipment_events", event.json())
+    bus.publish("shipment_events", event.model_dump_json())
     return {"message": "Shipment event published"}
