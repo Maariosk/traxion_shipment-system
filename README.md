@@ -94,3 +94,44 @@ pip install pytest
 ## 💾 Redis (Consideraciones):
 Para el uso de este proyecto se usó Redis Windows, por lo que se procedió con la instalación desde Docker basandonos en la documentación oficial del sitio.
 - **Aceso a Documentación:** https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/docker/
+
+## Estructura del Servicio:
+```
+                +--------------------------+
+                |       Cliente API        |
+                +------------+-------------+
+                             |
+                             v
+                  +-------------------+
+                  |     FastAPI       |
+                  |  (Producers)      |
+                  +-----+-----+-------+
+                        |     |
+                        |     |
+            +-----------+     +-------------+
+            |                           |
+            v                           v
+    Publish to Redis           Publish to Redis
+     channel "shipments"      channel "shipment_events"
+            |                           |
+            |                           |
+   +--------v---------+         +-------v----------+
+   | Integration      |         | Event Consumer  |
+   | Consumer         |         | (deduplica)    |
+   +--------+---------+         +-------+----------+
+            |                           |
+            v                           v
+  Guarda shipment           Guarda eventos shipment
+                              + analiza eventos
+
+                                     |
+                                     v
+                            +-------------------------+
+                            | Data Analysis Consumer  |
+                            | (COMPLETED/REJECTED)   |
+                            +-----------+-------------+
+                                        |
+                                        v
+                           Guarda conteos y métricas
+
+```
