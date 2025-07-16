@@ -90,3 +90,7 @@ pytest
 Si no lo instalaste al inicio con `pip install -r requirements.txt`, puedes hacerlo individualmente:
 ```bash
 pip install pytest
+```
+## 💾 Redis (Consideraciones):
+Para el uso de este proyecto se usó Redis Windows, por lo que se procedió con la instalación desde Docker basandonos en la documentación oficial del sitio.
+- **Aceso a Documentación:** https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/docker/
