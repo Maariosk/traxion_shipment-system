@@ -1,7 +1,7 @@
 import os
 import json
 from enum import Enum
-from typing import Literal
+from typing import Literal, Callable
 from dotenv import load_dotenv
 
 # Cargar variables desde .env si existe
@@ -40,7 +40,6 @@ except ImportError:
     publisher = None
     subscriber = None
 
-
 def publish(topic: str, message: str) -> None:
     if BUS_BACKEND == BusType.REDIS:
         if not r:
@@ -51,19 +50,22 @@ def publish(topic: str, message: str) -> None:
     elif BUS_BACKEND == BusType.PUBSUB:
         if not publisher:
             raise RuntimeError("GCP Pub/Sub client not available. Make sure google-cloud-pubsub is installed.")
+
         topic_path = publisher.topic_path(project_id, topic)
+        print(f"[PUBSUB] Topic Path: {topic_path}")
+
         try:
-            publisher.get_topic(topic=topic_path)  # Ensure topic exists
+            publisher.get_topic(topic=topic_path)
         except NotFound:
             publisher.create_topic(name=topic_path)
+
         future = publisher.publish(topic_path, message.encode("utf-8"))
         print(f"[PUBSUB] Published to {topic}: {message} [msg ID: {future.result()}]")
 
     else:
         raise ValueError(f"Unsupported BUS_BACKEND: {BUS_BACKEND}")
 
-
-def subscribe(topic: str, callback):
+def subscribe(topic: str, callback: Callable[[str], None], subscription_name: str = None):
     if BUS_BACKEND == BusType.REDIS:
         if not r:
             raise RuntimeError("Redis client not available.")
@@ -77,8 +79,15 @@ def subscribe(topic: str, callback):
     elif BUS_BACKEND == BusType.PUBSUB:
         if not subscriber:
             raise RuntimeError("GCP Pub/Sub subscriber not available.")
+
         topic_path = publisher.topic_path(project_id, topic)
-        subscription_path = subscriber.subscription_path(project_id, f"sub-{topic}")
+        if not subscription_name:
+            subscription_name = f"sub-{topic}"
+        subscription_path = subscriber.subscription_path(project_id, subscription_name)
+
+        print(f"[PUBSUB] Topic Path: {topic_path}")
+        print(f"[PUBSUB] Subscription Path: {subscription_path}")
+
         try:
             subscriber.get_subscription(subscription=subscription_path)
         except NotFound:
@@ -94,7 +103,6 @@ def subscribe(topic: str, callback):
 
     else:
         raise ValueError(f"Unsupported BUS_BACKEND: {BUS_BACKEND}")
-
 
 # Instancia de bus para importar fácilmente desde otros módulos
 class MessageBus:
