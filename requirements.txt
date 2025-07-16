@@ -1,4 +1,9 @@
 fastapi
 uvicorn
 redis
+httpx
 pydantic
+pytest
+pytest-asyncio
+anyio
+google-cloud-pubsub

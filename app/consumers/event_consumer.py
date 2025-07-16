@@ -1,25 +1,30 @@
+# app/consumers/event_consumer.py
+
 import json
-from app.core.redis_client import r
+from app.services.message_bus import subscribe
 
 processed_events = set()
 
+def handle_event(message: str):
+    try:
+        data = json.loads(message)
+        key = f"{data['shipment_id']}-{data['event']}"
 
-def event_consumer():
-    pubsub = r.pubsub()
-    pubsub.subscribe("shipment_events")
-    print("Event consumer listening...")
+        if key not in processed_events:
+            processed_events.add(key)
+            print(f"[Event Consumer] New event for shipment {data['shipment_id']}: {data['event']}")
+            # Aquí simulas la persistencia real
+        else:
+            print(f"[Event Consumer] Duplicate event ignored: {key}")
 
-    for message in pubsub.listen():
-        if message["type"] == "message":
-            data = json.loads(message["data"])
-            key = f"{data['shipment_id']}-{data['event']}"
-            if key not in processed_events:
-                processed_events.add(key)
-                print(f"[Event Consumer] New event for shipment {data['shipment_id']}: {data['event']}")
-                # Simulate persistence
-            else:
-                print(f"[Event Consumer] Duplicate event ignored: {key}")
+    except Exception as e:
+        print(f"[ERROR] Failed to process message: {message} — {e}")
 
 
 if __name__ == "__main__":
-    event_consumer()
+    print("[EVENT CONSUMER] Starting...")
+    future = subscribe("shipment_events", handle_event)
+
+    # En caso de Pub/Sub, se requiere .result() para mantenerlo activo
+    if future:
+        future.result()

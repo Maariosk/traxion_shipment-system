@@ -1,18 +1,19 @@
+# app/consumers/integration_consumer.py
+
 import json
-from app.core.redis_client import r
+from app.services.message_bus import subscribe
 
-
-def integration_consumer():
-    pubsub = r.pubsub()
-    pubsub.subscribe("shipments")
-    print("Integration consumer listening...")
-
-    for message in pubsub.listen():
-        if message["type"] == "message":
-            data = json.loads(message["data"])
-            print(f"[Integration Consumer] Shipment created: {data['id']}")
-            # Simulate persistence
+def handle_shipment(message: str):
+    try:
+        data = json.loads(message)
+        print(f"[Integration Consumer] Shipment created: {data['id']}")
+        # Aquí puedes simular persistencia en base de datos, archivo, etc.
+    except Exception as e:
+        print(f"[ERROR] Failed to process shipment: {message} — {e}")
 
 
 if __name__ == "__main__":
-    integration_consumer()
+    print("[INTEGRATION CONSUMER] Starting...")
+    future = subscribe("shipments", handle_shipment)
+    future.result()  # Esto bloquea el hilo y mantiene el proceso corriendo
+
