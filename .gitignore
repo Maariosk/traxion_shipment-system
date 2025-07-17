@@ -63,3 +63,24 @@ coverage.xml
 
 # Draw.io temporary files
 *.drawio~
+
+# Environment variables and credentials
+.env
+.env.*
+*.secret
+*.key
+*.pem
+*.crt
+*.pfx
+*.cer
+*.der
+*.jks
+*.p12
+*.cfg
+*.ini
+*.enc
+*.bak
+*.old
+credentials*.json
+gcp-credentials*.json
+*secrets*.json
