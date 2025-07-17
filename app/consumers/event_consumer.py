@@ -28,6 +28,7 @@ def handle_event(message: str):
             print(f"[Event Consumer] New event for shipment {data['shipment_id']}: {data['event']}")
 
             # Persistir en MongoDB
+            print(f"[DEBUG] Guardando en MongoDB: {data}")
             events_collection.insert_one(data)
 
         else:
